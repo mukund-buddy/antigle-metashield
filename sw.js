@@ -1,4 +1,4 @@
-var CACHE = 'metashield-v1';
+var CACHE = 'metashield-v2';
 
 var SHELL = [
   './',

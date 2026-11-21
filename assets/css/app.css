@@ -507,9 +507,13 @@ button { cursor: pointer; }
 
 @media (max-width: 720px) {
   .wrap { padding: 0 16px; }
-  .header-inner { height: 64px; }
+  .header-inner { height: 64px; gap: 12px; }
+  .brand-mark { width: 34px; height: 34px; border-radius: 10px; }
+  .brand-text { font-size: 1rem; }
+  .header-actions #installBtn { display: none; }
   .net-pill { display: none; }
   .hero { padding: 64px 0 58px; }
+  .hero-glow { opacity: .3; }
   .hero h1 { margin-top: 20px; }
   .hero-sub { font-size: .96rem; }
   .section { padding: 62px 0; }
@@ -531,16 +535,22 @@ button { cursor: pointer; }
   .file-thumb { width: 46px; height: 46px; }
   .file-actions { grid-column: 1 / -1; justify-content: flex-end; }
   .insp-grid { grid-template-columns: 1fr; }
+  .insp-table { table-layout: fixed; font-size: .78rem; }
+  .insp-table th, .insp-table td { overflow-wrap: anywhere; }
   .modal { padding: 10px; }
+  .modal-panel { max-height: 92dvh; }
   .modal-head, .modal-body { padding-inline: 18px; }
   .dropzone { padding: 36px 16px 30px; }
 }
 
 @media (max-width: 420px) {
+  .wrap { padding: 0 14px; }
   .btn-lg { padding: 14px 18px; font-size: .92rem; }
   .hero-cta { flex-direction: column; }
   .hero-cta .btn { width: 100%; }
   .dz-actions { flex-direction: column; gap: 10px; }
+  .results-actions { flex-direction: column; }
+  .results-actions .btn { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
