@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Antigle MetaShield — strip hidden metadata from photos, losslessly</title>
+<meta name="description" content="Remove EXIF, GPS, camera details, AI prompts and hidden tags from JPG, PNG and WebP files. Inspect and add your own author tags. 100% in your browser, no uploads, pixel-perfect output.">
+<meta name="theme-color" content="#7C3AED">
+<meta name="color-scheme" content="light">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<meta property="og:title" content="Antigle MetaShield — lossless metadata cleaner">
+<meta property="og:description" content="See exactly what your photos are hiding, then remove it without re-encoding a single pixel.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v5.5c0 4.2 2.9 7.9 7 9.5 4.1-1.6 7-5.3 7-9.5V6l-7-3Z"/><path d="m9.2 12.1 2 2 3.6-3.9"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 17 4.5-4.5 3.4 3.4L15 12.7 20 18"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="i-scissors" viewBox="0 0 24 24"><circle cx="6" cy="6.5" r="2.5"/><circle cx="6" cy="17.5" r="2.5"/><path d="m8.2 8.2 11 9.3M8.2 15.8 19.2 6.5"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1.6"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10" width="15" height="10" rx="3"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/><path d="M12 14v2.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 3 5.5 13.5h5L10 21l8.5-11h-5.2L13.5 3Z"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2.5"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M10 3v3M14 3v3M10 18v3M14 18v3M3 10h3M3 14h3M18 10h3M18 14h3"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="m11.2 3.5 8.4 1.9 1.9 8.4a2 2 0 0 1-.53 1.83l-6.1 6.1a2 2 0 0 1-2.83 0l-8-8a2 2 0 0 1 0-2.83l6.1-6.1a2 2 0 0 1 1.06-.3Z"/><circle cx="15.6" cy="8.4" r="1.5"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7.5 11 4.5 4.5 4.5-4.5"/><path d="M5 19h14"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="17.5" cy="6" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17.5" cy="18" r="2.5"/><path d="m8.7 10.8 6.5-3.5M8.7 13.2 15.2 16.7"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15"/><path d="M9.5 7V5.5A1.5 1.5 0 0 1 11 4h2a1.5 1.5 0 0 1 1.5 1.5V7"/><path d="M6.5 7l.8 11.2A2 2 0 0 0 9.3 20h5.4a2 2 0 0 0 2-1.8L17.5 7"/><path d="M10.5 11v5M13.5 11v5"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h3.3l2 2.4h7.7a2 2 0 0 1 2 2v7.6a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h13"/><path d="m13 7 5 5-5 5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4.5 3.2 19.5h17.6L12 4.5Z"/><path d="M12 10v4.2"/><path d="M12 17.2h.01"/></symbol>
+  <symbol id="i-offline" viewBox="0 0 24 24"><path d="M4.5 9.5a11 11 0 0 1 15 0"/><path d="M7.5 12.8a7 7 0 0 1 9 0"/><path d="M10.4 16a3 3 0 0 1 3.2 0"/><path d="M12 19.2h.01"/></symbol>
+</svg>
+
+<header class="site-header" id="top">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top" aria-label="Antigle MetaShield home">
+      <span class="brand-mark"><svg class="ico"><use href="#i-shield"/></svg></span>
+      <span class="brand-text">Meta<strong>Shield</strong></span>
+    </a>
+    <nav class="main-nav" aria-label="Sections">
+      <a href="#tool">Cleaner</a>
+      <a href="#what">What it does</a>
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="header-actions">
+      <span class="net-pill" id="netPill" title="Everything runs locally">
+        <svg class="ico"><use href="#i-offline"/></svg><span id="netText">On-device</span>
+      </span>
+      <button class="btn btn-ghost btn-sm" id="installBtn" hidden>Install app</button>
+      <a class="btn btn-primary btn-sm" href="#tool">Open cleaner</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="hero-glow glow-a"></div>
+    <div class="hero-glow glow-b"></div>
+    <div class="wrap hero-inner">
+      <span class="eyebrow"><span class="dot"></span>100% offline · no uploads · no account</span>
+      <h1>Strip what your photos<br><span class="grad">aren't telling you</span></h1>
+      <p class="hero-sub">
+        Every photo carries a story you never meant to share — GPS coordinates, camera serials,
+        edit history, even the AI prompt that made it. MetaShield removes it with binary-level
+        surgery, so your pixels stay exactly as they were.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#tool">Clean my images <svg class="ico"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-soft btn-lg" href="#what">See what's inside</a>
+      </div>
+      <ul class="chips hero-chips">
+        <li><svg class="ico"><use href="#i-check"/></svg>Lossless — no re-encoding</li>
+        <li><svg class="ico"><use href="#i-check"/></svg>Runs in your browser</li>
+        <li><svg class="ico"><use href="#i-check"/></svg>JPG · PNG · WebP</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== TOOL ===================== -->
+  <section class="section tool-section" id="tool">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">The cleaner</span>
+        <h2>Drop files. Look inside. Clean them.</h2>
+        <p>Everything below happens on this device. Nothing is uploaded, and there is no server to upload to.</p>
+      </div>
+
+      <div class="tool-card">
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Add images to clean">
+          <div class="dz-icon"><svg class="ico"><use href="#i-image"/></svg></div>
+          <h3>Drop images here</h3>
+          <p>or <button class="link-btn" id="browseBtn" type="button">browse files</button> — batch as many as you like</p>
+          <div class="dz-actions">
+            <button class="btn btn-soft btn-sm" type="button" id="folderBtn"><svg class="ico"><use href="#i-folder"/></svg>Add a folder</button>
+            <span class="dz-types">JPG · JPEG · PNG · WebP</span>
+          </div>
+          <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple hidden>
+          <input type="file" id="folderInput" webkitdirectory directory multiple hidden>
+        </div>
+
+        <div class="settings">
+          <div class="field field-wide">
+            <span class="field-label">Cleaning mode</span>
+            <div class="mode-grid" id="modeGroup">
+              <label class="mode-card">
+                <input type="radio" name="mode" value="smart" checked>
+                <span class="mode-inner">
+                  <span class="mode-top"><strong>Smart clean</strong><span class="pill pill-ok">Recommended</span></span>
+                  <span class="mode-desc">Removes GPS, camera, dates, prompts and comments. Keeps the ICC colour profile and Adobe colour marker so nothing shifts.</span>
+                </span>
+              </label>
+              <label class="mode-card">
+                <input type="radio" name="mode" value="strict">
+                <span class="mode-inner">
+                  <span class="mode-top"><strong>Max privacy</strong><span class="pill pill-warn">Everything</span></span>
+                  <span class="mode-desc">Strips referenced profiles too. Smallest output, but colours may look slightly different in picky apps.</span>
+                </span>
+              </label>
+              <label class="mode-card">
+                <input type="radio" name="mode" value="tag">
+                <span class="mode-inner">
+                  <span class="mode-top"><strong>Tag only</strong><span class="pill">Keep all</span></span>
+                  <span class="mode-desc">Leaves existing metadata untouched and only writes your author and copyright tags.</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="author">Author</label>
+            <input class="input" id="author" type="text" maxlength="120" placeholder="Your name or studio" autocomplete="name">
+          </div>
+          <div class="field">
+            <label class="field-label" for="copyright">Copyright</label>
+            <input class="input" id="copyright" type="text" maxlength="160" placeholder="© 2026 Your name">
+          </div>
+          <div class="field">
+            <label class="field-label" for="description">Description</label>
+            <input class="input" id="description" type="text" maxlength="200" placeholder="Optional caption written into the file">
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="naming">File names</label>
+            <select class="input select" id="naming">
+              <option value="clean">Add _clean suffix</option>
+              <option value="original">Keep original name</option>
+            </select>
+          </div>
+
+          <div class="switch-row">
+            <label class="switch">
+              <input type="checkbox" id="keepOrientation" checked>
+              <span class="track"><span class="thumb"></span></span>
+              <span class="switch-text">Preserve EXIF orientation<small>Stops rotated phone photos from showing sideways</small></span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="stripTrailer" checked>
+              <span class="track"><span class="thumb"></span></span>
+              <span class="switch-text">Remove appended data<small>Drops hidden bytes after the end of the image</small></span>
+            </label>
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn btn-primary" id="applyBtn" type="button"><svg class="ico"><use href="#i-bolt"/></svg>Apply settings</button>
+            <span class="hint">Changing a setting re-runs every file.</span>
+          </div>
+        </div>
+
+        <div class="results" id="results" hidden>
+          <div class="results-head">
+            <div class="summary" id="summary">
+              <div class="sum-item"><span class="sum-num" id="sumFiles">0</span><span class="sum-lbl">files</span></div>
+              <div class="sum-item"><span class="sum-num" id="sumRemoved">0 B</span><span class="sum-lbl">metadata removed</span></div>
+              <div class="sum-item"><span class="sum-num" id="sumSaved">0%</span><span class="sum-lbl">smaller</span></div>
+              <div class="sum-item sum-verified"><svg class="ico"><use href="#i-check"/></svg><span id="sumVerified">Pixel check passed</span></div>
+            </div>
+            <div class="results-actions">
+              <button class="btn btn-primary btn-sm" id="zipBtn" type="button"><svg class="ico"><use href="#i-archive"/></svg>Download all (ZIP)</button>
+              <button class="btn btn-soft btn-sm" id="shareBtn" type="button"><svg class="ico"><use href="#i-share"/></svg>Share</button>
+              <button class="btn btn-ghost btn-sm" id="clearBtn" type="button"><svg class="ico"><use href="#i-trash"/></svg>Clear</button>
+            </div>
+          </div>
+          <div class="progress" id="progress" hidden>
+            <div class="progress-bar"><span id="progressFill"></span></div>
+            <span class="progress-text" id="progressText"></span>
+          </div>
+          <ul class="file-list" id="fileList"></ul>
+          <p class="results-foot"><svg class="ico"><use href="#i-lock"/></svg>Files never leave this tab. Close it and nothing remains.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== WHAT ===================== -->
+  <section class="section alt" id="what">
+    <div class="wrap split">
+      <div class="split-copy">
+        <span class="kicker">What it does</span>
+        <h2>The parts of a photo that never show up on screen</h2>
+        <p class="lead">
+          A JPEG is a stack of segments. The picture is only some of them. The rest is paperwork:
+          who took it, where, on what, with which lens, edited in which app, and sometimes the entire
+          AI prompt used to generate it.
+        </p>
+        <p>
+          MetaShield walks that structure byte by byte. It reads every segment, shows you what each one
+          holds, then rebuilds the file without the ones you don't want — leaving the compressed image
+          data byte-for-byte identical. No canvas, no re-encode, no quality loss.
+        </p>
+        <ul class="tick-list">
+          <li><strong>Inspect first.</strong> A readable report of every tag, chunk and segment, with a privacy score.</li>
+          <li><strong>Then clean.</strong> Remove GPS, camera identity, timestamps, IPTC, XMP, comments and AI prompts.</li>
+          <li><strong>Or write.</strong> Add your own author, copyright and description inside the file.</li>
+        </ul>
+      </div>
+      <div class="split-visual">
+        <div class="inspector-mock" aria-hidden="true">
+          <div class="mock-head">
+            <span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span>
+            <span class="mock-title">photo_2026.jpg · 3.8 MB</span>
+          </div>
+          <div class="mock-risk">
+            <span class="mock-risk-label">Privacy risk</span>
+            <span class="risk-bar"><span style="width:93%"></span></span>
+            <span class="pill pill-danger">High</span>
+          </div>
+          <ul class="mock-rows">
+            <li><span class="m">APP1 · EXIF</span><span class="s">2.4 KB</span><span class="pill pill-danger">GPS inside</span></li>
+            <li><span class="m">APP1 · XMP</span><span class="s">1.1 KB</span><span class="pill pill-danger">Creator + edits</span></li>
+            <li><span class="m">APP13 · IPTC</span><span class="s">412 B</span><span class="pill pill-warn">Captions</span></li>
+            <li><span class="m">COM · comment</span><span class="s">96 B</span><span class="pill pill-warn">Text</span></li>
+            <li><span class="m">APP2 · ICC</span><span class="s">588 B</span><span class="pill pill-ok">Kept</span></li>
+            <li><span class="m">SOS · scan data</span><span class="s">3.7 MB</span><span class="pill pill-ok">Untouched</span></li>
+          </ul>
+          <div class="mock-foot">
+            <svg class="ico"><use href="#i-check"/></svg>Pixel data verified byte-identical
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FEATURES ===================== -->
+  <section class="section" id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">Features</span>
+        <h2>Small tool, serious engine</h2>
+        <p>Built for people who actually care what happens to their files.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature">
+          <span class="f-num">01</span>
+          <span class="f-icon tint-purple"><svg class="ico"><use href="#i-scissors"/></svg></span>
+          <h3>True binary stripping</h3>
+          <p>JPEG segments, PNG chunks and WebP RIFF blocks are cut at the byte level. Your image data is copied, never decoded or re-compressed.</p>
+        </article>
+        <article class="feature">
+          <span class="f-num">02</span>
+          <span class="f-icon tint-amber"><svg class="ico"><use href="#i-eye"/></svg></span>
+          <h3>Readable inspection</h3>
+          <p>GPS coordinates, camera make and model, lens, ISO, shutter, edit software, IPTC captions and AI prompts — laid out in plain language.</p>
+        </article>
+        <article class="feature">
+          <span class="f-num">03</span>
+          <span class="f-icon tint-pink"><svg class="ico"><use href="#i-tag"/></svg></span>
+          <h3>Write your own tags</h3>
+          <p>Injects Author, Copyright and Description into EXIF, PNG iTXt or WebP XMP — properly formed, three bytes short of bloated.</p>
+        </article>
+        <article class="feature">
+          <span class="f-num">04</span>
+          <span class="f-icon tint-sky"><svg class="ico"><use href="#i-archive"/></svg></span>
+          <h3>Bulk without limits</h3>
+          <p>Hundreds of files at once, folders included. Everything lands in one ZIP — written by the app itself, so no dependency downloads.</p>
+        </article>
+        <article class="feature">
+          <span class="f-num">05</span>
+          <span class="f-icon tint-green"><svg class="ico"><use href="#i-shield"/></svg></span>
+          <h3>Colour-safe modes</h3>
+          <p>Smart mode keeps ICC profiles and the Adobe transform marker, so wide-gamut and CMYK photos don't shift colour after cleaning.</p>
+        </article>
+        <article class="feature">
+          <span class="f-num">06</span>
+          <span class="f-icon tint-slate"><svg class="ico"><use href="#i-cpu"/></svg></span>
+          <h3>Offline by design</h3>
+          <p>Installable PWA with a local service worker. Server, account and tracker count: zero. Works in airplane mode after the first visit.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== HOW ===================== -->
+  <section class="section alt" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">How it works</span>
+        <h2>Three steps, no queue</h2>
+        <p>There is no round trip to a server, so there is nothing to wait for.</p>
+      </div>
+      <ol class="steps">
+        <li>
+          <span class="step-num">01</span>
+          <h3>Add your images</h3>
+          <p>Drag a batch in, pick files, or pull in a whole folder. Previews appear immediately.</p>
+        </li>
+        <li>
+          <span class="step-num">02</span>
+          <h3>Inspect and choose</h3>
+          <p>Open any file to see exactly what it carries. Pick smart, max privacy, or tag-only.</p>
+        </li>
+        <li>
+          <span class="step-num">03</span>
+          <h3>Download or share</h3>
+          <p>Save files one by one, grab a ZIP, or send them straight to another app on your phone.</p>
+        </li>
+      </ol>
+      <div class="how-note">
+        <svg class="ico"><use href="#i-warn"/></svg>
+        <p><strong>One thing worth knowing:</strong> some phone photos are stored sideways with an EXIF flag telling viewers to rotate them.
+        Stripping that flag makes them look rotated. MetaShield reads it first and can keep it — that switch is on by default.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FAQ ===================== -->
+  <section class="section" id="faq">
+    <div class="wrap narrow">
+      <div class="section-head">
+        <span class="kicker">FAQ</span>
+        <h2>Fair questions</h2>
+      </div>
+      <details class="faq" open>
+        <summary>Does cleaning change how my photo looks?</summary>
+        <p>No. The compressed image data is copied byte for byte, and the app re-parses its own output to confirm the pixel stream hash matches the original. In smart mode the colour profile is kept too, so colour reproduction stays the same.</p>
+      </details>
+      <details class="faq">
+        <summary>Are my files uploaded anywhere?</summary>
+        <p>Never. The app is a static page with no backend. You can disconnect from the network and it still works. That is also why it installs as an app: the whole thing is cached on your device.</p>
+      </details>
+      <details class="faq">
+        <summary>Which files are supported?</summary>
+        <p>JPEG (baseline and progressive), PNG (including APNG animation, which is preserved) and WebP (lossy, lossless and animated). Other formats are rejected rather than silently mangled.</p>
+      </details>
+      <details class="faq">
+        <summary>Will it remove watermarks?</summary>
+        <p>No. Visible watermarks are part of the picture. MetaShield only removes metadata — hidden text, tags and appended blocks. It is not a watermark remover.</p>
+      </details>
+      <details class="faq">
+        <summary>What does strip appended data do?</summary>
+        <p>Some tools attach extra bytes after the end of the image. Viewers ignore them, but they can hold hidden payloads. Removing them is safe; leaving them keeps the file bit-identical apart from the metadata you removed.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="wrap cta-inner">
+      <div>
+        <h2>Your photo, minus the paper trail.</h2>
+        <p>No sign-up. No upload. No quality loss.</p>
+      </div>
+      <a class="btn btn-primary btn-lg" href="#tool">Open the cleaner <svg class="ico"><use href="#i-arrow"/></svg></a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="foot-brand">
+      <span class="brand-mark"><svg class="ico"><use href="#i-shield"/></svg></span>
+      <div>
+        <span class="brand-text">Meta<strong>Shield</strong></span>
+        <p>Part of the Antigle tool family. Static, local, MIT-spirited.</p>
+      </div>
+    </div>
+    <nav class="foot-nav" aria-label="Footer">
+      <a href="#tool">Cleaner</a>
+      <a href="#what">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <p class="foot-note">Runs entirely in your browser · v1.0</p>
+  </div>
+</footer>
+
+<!-- ===================== INSPECTOR ===================== -->
+<div class="modal" id="inspector" hidden aria-hidden="true">
+  <div class="modal-backdrop" data-close="1"></div>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="inspectorTitle">
+    <div class="modal-head">
+      <div>
+        <span class="kicker" id="inspectorKind">Inspector</span>
+        <h2 id="inspectorTitle">File</h2>
+      </div>
+      <button class="icon-btn" id="inspectorClose" type="button" aria-label="Close inspector"><svg class="ico"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="modal-body" id="inspectorBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/js/engine.js"></script>
+<script src="assets/js/zip.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
